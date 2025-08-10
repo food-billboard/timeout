@@ -1,0 +1,34 @@
+.score-app {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding: 0 1rem;
+  &-main {
+    overflow-y: auto;
+    flex: 1;
+    &-header {
+      height: 6rem;
+      box-sizing: border-box;
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      &-username {
+        font-size: 1.5em;
+        display: flex;
+        align-items: center;
+        white-space: nowrap;
+      }
+      & > div {
+        width: 33.33%;
+      }
+    }
+    &-content {
+      height: ~'calc( 100% - 6rem )';
+    }
+  }
+  &-bottom {
+    background-color: white;
+  }
+}

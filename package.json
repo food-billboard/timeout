@@ -1,0 +1,41 @@
+{
+  "private": true,
+  "author": "food-billboard <18368003190@163.com>",
+  "scripts": {
+    "dev": "cross-env REACT_APP_ENV=dev umi dev",
+    "build": "cross-env REACT_APP_ENV=prod umi build",
+    "postinstall": "umi setup",
+    "setup": "umi setup",
+    "start": "npm run dev",
+    "deploy": "node ./scripts/raspberryDeploy.js",
+    "build-and-deploy": "npm run build && npm run deploy"
+  },
+  "dependencies": {
+    "@wangeditor/editor": "^5.1.23",
+    "@wangeditor/editor-for-react": "^1.0.6",
+    "ahooks": "^3.8.4",
+    "antd-mobile": "^5.38.1",
+    "antd-mobile-icons": "^0.3.0",
+    "axios": "^1.7.9",
+    "chunk-file-upload": "^1.0.11",
+    "dayjs": "^1.11.13",
+    "eventemitter3": "^5.0.1",
+    "exif-js": "^2.3.0",
+    "lodash": "^4.17.21",
+    "mime": "^4.0.6",
+    "umi": "^4.4.1"
+  },
+  "devDependencies": {
+    "@types/exif-js": "^2.3.1",
+    "@types/lodash": "^4.17.13",
+    "@types/mime": "^4.0.0",
+    "@types/react": "^18.0.33",
+    "@types/react-dom": "^18.0.11",
+    "chalk": "4.1.0",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.4.7",
+    "postcss-pxtorem": "^6.1.0",
+    "ssh2-sftp-client": "9.1.0",
+    "typescript": "^5.0.3"
+  }
+}

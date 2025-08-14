@@ -4,7 +4,7 @@ import { CameraOutline } from 'antd-mobile-icons'
 import styles from './index.less';
 import Header from '@/components/Header';
 import dayjs from 'dayjs';
-import { Button } from 'antd-mobile';
+import { Button, FloatingBubble } from 'antd-mobile';
 
 const EventDetail = () => {
 
@@ -41,9 +41,16 @@ const EventDetail = () => {
           </div>
         </div>
       </div>
-      <div className={styles['event-detail-footer']}>
-        <CameraOutline onClick={handleClick} />
-      </div>
+      <FloatingBubble
+        style={{
+          '--initial-position-bottom': '128px',
+          '--initial-position-right': '24px',
+          '--edge-distance': '24px',
+        }}
+        onClick={handleClick}
+      >
+        <CameraOutline fontSize={32} />
+      </FloatingBubble>
     </div>
 
   );

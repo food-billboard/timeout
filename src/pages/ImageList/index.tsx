@@ -30,14 +30,16 @@ export const ImageGrid = (props: {
     <div
       onClick={onClick?.bind(null, value)}
       key={_id}
-      className={styles['image-list-main-content-item']}
+      className={styles['image-list-item']}
     >
-      <img src={image} />
       <div>
-        <div>{dayjs(create_date).diff(start_date, 'day')}</div>
-        <div>{dayjs(create_date).format('YYYY-MM-DD')}</div>
+        <img src={image} />
+        <div className={styles['image-list-item-info']}>
+          <div>{dayjs(create_date).diff(start_date, 'day')}</div>
+          <div>{dayjs(create_date).format('YYYY-MM-DD')}</div>
+        </div>
+        {extra}
       </div>
-      {extra}
     </div>
   );
 };
@@ -47,7 +49,34 @@ const ImageList = () => {
     {}) as API_TIME.GetTimeListData;
 
   const [dataSource, setDataSource] = useState<API_TIME.GetTimeImageListData[]>(
-    [],
+    [
+      {
+        _id: 'string',
+        event: 'string',
+        event_name: 'string',
+        start_date: 'string',
+        description: 'string',
+        image:
+          'https://t8.baidu.com/it/u=3032461838,1625380434&fm=217&app=126&size=re3,2&q=75&n=0&g=3n&f=JPEG&fmt=auto&maxorilen2heic=2000000?s=E9C0A3464AA5936E487CE40D030070C2',
+        image_id: 'string',
+        createdAt: 'string',
+        updatedAt: 'string',
+        create_date: 'string',
+      },
+      {
+        _id: 'string1',
+        event: 'string',
+        event_name: 'string',
+        start_date: 'string',
+        description: 'string',
+        image:
+          'https://t8.baidu.com/it/u=3032461838,1625380434&fm=217&app=126&size=re3,2&q=75&n=0&g=3n&f=JPEG&fmt=auto&maxorilen2heic=2000000?s=E9C0A3464AA5936E487CE40D030070C2',
+        image_id: 'string2',
+        createdAt: 'string',
+        updatedAt: 'string',
+        create_date: 'string',
+      },
+    ],
   );
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore, getHasMore] = useGetState(true);
@@ -67,7 +96,7 @@ const ImageList = () => {
         if (reset) return data.list;
         return [...prev, ...data.list];
       });
-      setHasMore(data.list.length === 10)
+      setHasMore(data.list.length === 10);
     });
   }, []);
 
@@ -90,19 +119,20 @@ const ImageList = () => {
       callback: () => {
         var reader = new FileReader();
         reader.onload = function (event: any) {
-          var data = event.target.result; 
+          var data = event.target.result;
           EXIF.getData(metaData.file, function () {
-            var allMetadata = EXIF.getAllTags(metaData.file); 
+            var allMetadata = EXIF.getAllTags(metaData.file);
             postImage({
               ...metaData,
-              create_date: allMetadata.DateTimeOriginal || dayjs().format('YYYY-MM-DD')
+              create_date:
+                allMetadata.DateTimeOriginal || dayjs().format('YYYY-MM-DD'),
             })
-            .then(() => {})
-            .catch((err) => {})
-            .then(() => {
-              setLoading(false);
-              fetchData(true)
-            });
+              .then(() => {})
+              .catch((err) => {})
+              .then(() => {
+                setLoading(false);
+                fetchData(true);
+              });
           });
         };
         reader.readAsDataURL(metaData.file); // 以 Data URL 的形式读取文件内容
@@ -131,82 +161,89 @@ const ImageList = () => {
           </Button>
         }
       />
-      <div className={styles['image-list-title']}>
-        <div className={styles['image-list-title-left']}>
-          <div>{event_name}已经</div>
-          <div>{dayjs(start_date).format('YYYY-MM-DD dddd')}</div>
+      <div className={styles['image-list-wrapper']}>
+        <div className={styles['image-list-title']}>
+          <div className={styles['image-list-title-left']}>
+            <div>{event_name}已经</div>
+            <div>{dayjs(start_date).format('YYYY-MM-DD dddd')}</div>
+          </div>
+          <div className={styles['image-list-title-right']}>
+            {dayjs().diff(dayjs(start_date), 'day')}
+          </div>
         </div>
-        <div className={styles['image-list-title-right']}>
-          {dayjs().diff(dayjs(start_date), 'day')}
-        </div>
-      </div>
-      <div className={styles['image-list-main']}>
-        <div className={styles['image-list-main-header']}>
-          <Tabs activeKey={activeKey} onChange={setActiveKey}>
-            <Tabs.Tab title="全部" key="all">
-              <Grid columns={3} gap={8}>
-                {dataSource.map((item) => {
-                  const { _id, image, create_date } = item;
-                  return (
-                    <Grid.Item key={_id}>
-                      <ImageGrid value={item} onClick={handleImageDetail} />
-                    </Grid.Item>
-                  );
-                })}
-              </Grid>
-            </Tabs.Tab>
-            <Tabs.Tab title="时间轴" key="timeline">
-              <Steps direction="vertical">
-                {dataSource.map((item) => {
-                  const { _id, image, create_date } = item;
-                  return (
-                    <Steps.Step
-                      key={_id}
-                      title={dayjs(create_date).format('YYYY-MM-DD')}
-                      status="process"
-                      description={
-                        <div
-                          className={styles['image-list-main-content-timeline']}
-                        >
-                          <div>
-                            <div>{event_name}已经</div>
+        <div className={styles['image-list-main']}>
+          <div className={styles['image-list-main-header']}>
+            <Tabs activeKey={activeKey} onChange={setActiveKey}>
+              <Tabs.Tab title="全部" key="all">
+                <Grid columns={3} gap={8} style={{ backgroundColor: 'white' }}>
+                  {dataSource.map((item) => {
+                    const { _id, image, create_date } = item;
+                    return (
+                      <Grid.Item key={_id}>
+                        <ImageGrid value={item} onClick={handleImageDetail} />
+                      </Grid.Item>
+                    );
+                  })}
+                </Grid>
+              </Tabs.Tab>
+              <Tabs.Tab title="时间轴" key="timeline">
+                <Steps
+                  direction="vertical"
+                  style={{ backgroundColor: 'white' }}
+                >
+                  {dataSource.map((item) => {
+                    const { _id, image, create_date } = item;
+                    return (
+                      <Steps.Step
+                        key={_id}
+                        title={dayjs(create_date).format('YYYY-MM-DD')}
+                        status="process"
+                        description={
+                          <div
+                            className={
+                              styles['image-list-main-content-timeline']
+                            }
+                          >
+                            <div className={styles['image-list-main-content-timeline-info']}>
+                              <div>{event_name}已经</div>
+                              <div>
+                                {dayjs(create_date).diff(
+                                  dayjs(start_date),
+                                  'day',
+                                )}
+                              </div>
+                            </div>
                             <div>
-                              {dayjs(create_date).diff(
-                                dayjs(start_date),
-                                'day',
-                              )}
+                              <img
+                                src={image}
+                                onClick={handleImageDetail.bind(null, item)}
+                              />
                             </div>
                           </div>
-                          <div>
-                            <img
-                              src={image}
-                              onClick={handleImageDetail.bind(null, item)}
-                            />
-                          </div>
-                        </div>
-                      }
-                    />
-                  );
-                })}
-              </Steps>
-            </Tabs.Tab>
-          </Tabs>
+                        }
+                      />
+                    );
+                  })}
+                </Steps>
+              </Tabs.Tab>
+            </Tabs>
+          </div>
+          <div className={styles['image-list-main-content']}></div>
         </div>
-        <div className={styles['image-list-main-content']}></div>
+        <FloatingBubble
+          style={{
+            '--initial-position-bottom': '24px',
+            '--initial-position-right': '24px',
+            '--edge-distance': '24px',
+          }}
+          onClick={handleUpload}
+          axis="xy"
+          magnetic="x"
+        >
+          <AddOutline fontSize={32} />
+        </FloatingBubble>
+        <InfiniteScroll loadMore={fetchData.bind(false)} hasMore={hasMore} />
       </div>
-      <FloatingBubble
-        style={{
-          '--initial-position-bottom': '24px',
-          '--initial-position-right': '24px',
-          '--edge-distance': '24px',
-        }}
-        onClick={handleUpload}
-        axis="xy"
-        magnetic="x"
-      >
-        <AddOutline fontSize={32} />
-      </FloatingBubble>
-      <InfiniteScroll loadMore={fetchData.bind(false)} hasMore={hasMore} />
     </div>
   );
 };

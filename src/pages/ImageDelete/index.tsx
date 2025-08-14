@@ -24,7 +24,34 @@ const ImageDelete = () => {
 
   const [dataSource, setDataSource, getDataSource] = useGetState<
     API_TIME.GetTimeImageListData[]
-  >([]);
+  >([
+    {
+      _id: 'string',
+      event: 'string',
+      event_name: 'string',
+      start_date: 'string',
+      description: 'string',
+      image:
+        'https://t8.baidu.com/it/u=3032461838,1625380434&fm=217&app=126&size=re3,2&q=75&n=0&g=3n&f=JPEG&fmt=auto&maxorilen2heic=2000000?s=E9C0A3464AA5936E487CE40D030070C2',
+      image_id: 'string',
+      createdAt: 'string',
+      updatedAt: 'string',
+      create_date: 'string',
+    },
+    {
+      _id: 'string1',
+      event: 'string',
+      event_name: 'string',
+      start_date: 'string',
+      description: 'string',
+      image:
+        'https://t8.baidu.com/it/u=3032461838,1625380434&fm=217&app=126&size=re3,2&q=75&n=0&g=3n&f=JPEG&fmt=auto&maxorilen2heic=2000000?s=E9C0A3464AA5936E487CE40D030070C2',
+      image_id: 'string2',
+      createdAt: 'string',
+      updatedAt: 'string',
+      create_date: 'string',
+    },
+  ]);
   const [hasMore, setHasMore] = useState(true);
   const [selectList, setSelectList] = useState<string[]>([]);
 
@@ -105,7 +132,7 @@ const ImageDelete = () => {
   }, []);
 
   return (
-    <div className={styles['image-list-container']}>
+    <div className={styles['image-delete']}>
       <Header rightNode={(<Button onClick={handleCancel}>取消</Button>)} />
       {dataSource.length > 0 ? (
         <>
@@ -118,7 +145,7 @@ const ImageDelete = () => {
                       value={item}
                       onClick={handleSelect}
                       extra={
-                        <div>
+                        <div className={styles['image-list-check']}>
                           <Checkbox checked={selectList.includes(item._id)} />
                         </div>
                       }
@@ -144,7 +171,7 @@ const ImageDelete = () => {
           正在拼命加载数据
         </div>
       )}
-      <div className={styles['image-list-footer']}>
+      <div className={styles['image-delete-footer']}>
         <Button onClick={handleCancel}>取消</Button>
         <Button
           disabled={!selectList.length}

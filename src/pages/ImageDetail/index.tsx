@@ -1,6 +1,10 @@
 import { FloatingBubble, Grid, Modal, Popup, Toast } from 'antd-mobile';
 import { history } from 'umi';
-import { DeleteOutline, EditSOutline, AppstoreOutline } from 'antd-mobile-icons';
+import {
+  DeleteOutline,
+  EditSOutline,
+  AppstoreOutline,
+} from 'antd-mobile-icons';
 import { useEffect, useState } from 'react';
 import { deleteImage, getImageList } from '@/services/base';
 import styles from './index.less';
@@ -10,8 +14,8 @@ const ImageDetail = () => {
   const imageData = history.location.state as API_TIME.GetTimeImageListData;
   const { _id, image, image_id, event, event_name, start_date } = imageData;
 
-  const [ imageState, setImageState ] = useState(imageData)
-  const { create_date } = imageState
+  const [imageState, setImageState] = useState(imageData);
+  const { create_date } = imageState;
 
   const [visible, setVisible] = useState(false);
 
@@ -21,20 +25,19 @@ const ImageDetail = () => {
         currPage: 0,
         pageSize: 999,
         _id: image_id,
-        event
-      })
-      .then(data => {
-        const [target] = data.list || []
-        setImageState(prev => {
+        event,
+      }).then((data) => {
+        const [target] = data.list || [];
+        setImageState((prev) => {
           return {
             ...prev,
-            ...target || {}
-          }
-        })
-      })
+            ...(target || {}),
+          };
+        });
+      });
     }
-    fetchData()
-  }, [image_id, event])
+    fetchData();
+  }, [image_id, event]);
 
   return (
     <div className={styles['image-detail']}>
@@ -79,58 +82,61 @@ const ImageDetail = () => {
         visible={visible}
         position="bottom"
         onClose={() => setVisible(false)}
+        closeOnMaskClick
       >
-        <div className={styles['action-header']}>你可能想要</div>
-        <div className={styles['action-content']}>
-          <Grid columns={2}>
-            {[
-              {
-                icon: <EditSOutline />,
-                label: '修改信息',
-                action: () => {
-                  history.push('/image-edit', imageState)
+        <div className={styles['action']}>
+          <div className={styles['action-header']}>你是否要</div>
+          <div className={styles['action-content']}>
+            <Grid columns={2} gap={16}>
+              {[
+                {
+                  icon: <EditSOutline />,
+                  label: '修改信息',
+                  action: () => {
+                    history.push('/image-edit', imageState);
+                  },
                 },
-              },
-              {
-                icon: <DeleteOutline />,
-                label: '删除',
-                action: () => {
-                  Modal.confirm({
-                    content: '是否确定删除',
-                    onConfirm: async () => {
-                      try {
-                        await deleteImage({
-                          _id,
-                        });
-                        Toast.show({
-                          icon: 'success',
-                          content: '操作成功',
-                          afterClose: () => {
-                            history.go(-1);
-                          },
-                        });
-                      } catch (err) {
-                        Toast.show({
-                          icon: 'fail',
-                          content: '操作失败',
-                        });
-                      }
-                    },
-                  });
+                {
+                  icon: <DeleteOutline />,
+                  label: '删除',
+                  action: () => {
+                    Modal.confirm({
+                      content: '是否确定删除',
+                      onConfirm: async () => {
+                        try {
+                          await deleteImage({
+                            _id,
+                          });
+                          Toast.show({
+                            icon: 'success',
+                            content: '操作成功',
+                            afterClose: () => {
+                              history.go(-1);
+                            },
+                          });
+                        } catch (err) {
+                          Toast.show({
+                            icon: 'fail',
+                            content: '操作失败',
+                          });
+                        }
+                      },
+                    });
+                  },
                 },
-              },
-            ].map((item) => {
-              const { label, icon, action } = item;
-              return (
-                <Grid.Item key={label}>
-                  <div onClick={action}>
-                    {icon}
-                    <div>{label}</div>
-                  </div>
-                </Grid.Item>
-              );
-            })}
-          </Grid>
+              ].map((item) => {
+                const { label, icon, action } = item;
+                return (
+                  <Grid.Item key={label}>
+                    <div onClick={action} className={styles['action-item']}>
+                      {icon}
+                      <div>{label}</div>
+                    </div>
+                  </Grid.Item>
+                );
+              })}
+            </Grid>
+          </div>
         </div>
       </Popup>
     </div>

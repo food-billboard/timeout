@@ -7,7 +7,17 @@ import styles from './index.less';
 import dayjs from 'dayjs';
 
 const PageHome = () => {
-  const [dataSource, setDataSource] = useState<API_TIME.GetTimeListData[]>([]);
+  const [dataSource, setDataSource] = useState<API_TIME.GetTimeListData[]>([
+    {
+      _id: 'string', 
+      create_user: 'string', 
+      create_user_name: 'string', 
+      createdAt: 'string', 
+      updatedAt: 'string', 
+      event_name: 'string', 
+      start_date: 'string' 
+    }
+  ]);
 
   const searchContent = useRef('');
 
@@ -57,10 +67,12 @@ const PageHome = () => {
               <div className={styles['home-list-item-title']}>
                 {event_name}已经
               </div>
-              <div className={styles['home-list-item-number']}>
-                {dayjs().diff(dayjs(start_date), 'day')}
+              <div className={styles['home-list-item-extra']}>
+                <div className={styles['home-list-item-number']}>
+                  {dayjs().diff(dayjs(start_date), 'day')}
+                </div>
+                <div className={styles['home-list-item-unit']}>天</div>
               </div>
-              <div className={styles['home-list-item-unit']}>天</div>
             </div>
           );
         })}

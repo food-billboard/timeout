@@ -9,7 +9,7 @@ import mockLogin from '@/utils/mockLogin';
 export default function Layout() {
 
   const [activeKey, setActiveKey] = useState('/');
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
 
   const { username, score, avatar } = getUserInfoData();
 
@@ -43,20 +43,6 @@ export default function Layout() {
   return (
     <div className={styles['score-app']}>
       <div className={styles['score-app-main']}>
-        <div className={styles['score-app-main-header']}>
-          <div className={styles['score-app-main-header-username']}>
-            <Avatar
-              src={avatar}
-              style={{ '--size': '48px', marginRight: '.5em' }}
-            />
-            {username}
-          </div>
-          <div className={'star j-c'}>
-            <div></div>
-            <div>{score}</div>
-          </div>
-          <div className="t-r">x</div>
-        </div>
         <div className={styles['score-app-main-content']}> 
           {
             !loading && <Outlet />

@@ -6,6 +6,7 @@ import {
   AppstoreOutline,
 } from 'antd-mobile-icons';
 import { useEffect, useState } from 'react';
+import ImageView from '../ImageList/ImageView';
 import { deleteImage, getImageList } from '@/services/base';
 import styles from './index.less';
 import dayjs from 'dayjs';
@@ -42,7 +43,7 @@ const ImageDetail = () => {
   return (
     <div className={styles['image-detail']}>
       <div className={styles['image-detail-content']}>
-        <img src={image} />
+        <ImageView src={image} />
         <div className={styles['image-detail-content-label']}>
           <div className={styles['image-detail-content-label-left']}>
             <div>{event_name}已经</div>

@@ -4,7 +4,6 @@ import {
   Grid,
   FloatingBubble,
   Steps,
-  Button,
 } from 'antd-mobile';
 import { ReactNode, useCallback, useState } from 'react';
 import { history } from 'umi';
@@ -13,9 +12,10 @@ import { AddOutline } from 'antd-mobile-icons';
 import { getImageList, postImage } from '@/services/base';
 import styles from './index.less';
 import { useGetState } from 'ahooks';
-import EXIF from 'exif-js';
+import exifr from 'exifr';
 import dayjs from 'dayjs';
 import { uploadFile } from '@/utils/Upload';
+import ImageView from './ImageView';
 
 export const ImageGrid = (props: {
   extra?: ReactNode;
@@ -33,7 +33,7 @@ export const ImageGrid = (props: {
       className={styles['image-list-item']}
     >
       <div>
-        <img src={image} />
+        <ImageView src={image} />
         <div className={styles['image-list-item-info']}>
           <div>{dayjs(create_date).diff(start_date, 'day')}</div>
           <div>{dayjs(create_date).format('YYYY-MM-DD')}</div>
@@ -82,35 +82,25 @@ const ImageList = () => {
 
   const handleUpload = useCallback(async () => {
     if (loading) return;
-    setLoading(true);
     const metaData: any = {
       description: '',
       event: _id,
     };
     uploadFile({
       accept: 'image/*',
-      callback: () => {
-        var reader = new FileReader();
-        reader.onload = function (event: any) {
-          var data = event.target.result;
-          console.log(data, 22222)
-          EXIF.getData(metaData.file, function () {
-            var allMetadata = EXIF.getAllTags(metaData.file);
-            console.log(allMetadata, 33333)
-            postImage({
-              ...metaData,
-              create_date:
-                allMetadata.DateTimeOriginal || dayjs().format('YYYY-MM-DD'),
-            })
-              .then(() => {})
-              .catch((err) => {})
-              .then(() => {
-                setLoading(false);
-                fetchData(true);
-              });
+      callback: async () => {
+        const allMetadata = await exifr.parse(metaData.file);
+        await postImage({
+          ...metaData,
+          create_date:
+            allMetadata.DateTimeOriginal || dayjs().format('YYYY-MM-DD'),
+        })
+          .then(() => {})
+          .catch((err) => {})
+          .then(() => {
+            setLoading(false);
+            fetchData(true);
           });
-        };
-        reader.readAsDataURL(metaData.file); // 以 Data URL 的形式读取文件内容
       },
       uploadEnd: (fileId) => {
         metaData.image = fileId;
@@ -118,6 +108,10 @@ const ImageList = () => {
       upload: (file) => {
         metaData.file = file;
       },
+      beforeUpload: () => {
+        setLoading(true);
+        return true 
+      }
     });
   }, [loading]);
 
@@ -176,7 +170,7 @@ const ImageList = () => {
                               </div>
                             </div>
                             <div>
-                              <img
+                              <ImageView  
                                 src={image}
                                 onClick={handleImageDetail.bind(null, item)}
                               />

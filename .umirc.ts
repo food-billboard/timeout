@@ -12,7 +12,7 @@ export default defineConfig({
   ...(process.env.REACT_APP_ENV === 'prod' ? {
     // base: '/api/backend/eat-what/',
     base: '/',
-    publicPath: '/api/backend/score/',
+    publicPath: '/api/backend/timeout/',
   } : {}),
   define: {
     'process.env.DEFAULT_CHILD_ID': process.env.DEFAULT_CHILD_ID,

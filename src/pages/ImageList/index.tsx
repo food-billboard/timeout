@@ -93,8 +93,10 @@ const ImageList = () => {
         var reader = new FileReader();
         reader.onload = function (event: any) {
           var data = event.target.result;
+          console.log(data, 22222)
           EXIF.getData(metaData.file, function () {
             var allMetadata = EXIF.getAllTags(metaData.file);
+            console.log(allMetadata, 33333)
             postImage({
               ...metaData,
               create_date:

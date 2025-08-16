@@ -1,15 +1,13 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import {
   InfiniteScroll,
   Space,
   Button,
-  DotLoading,
   Grid,
   Checkbox,
   Modal,
   Toast,
 } from 'antd-mobile';
-import Header from '@/components/Header';
 import { history } from 'umi';
 import classnames from 'classnames';
 import { getImageList, deleteImage } from '@/services/base';
@@ -24,38 +22,11 @@ const ImageDelete = () => {
 
   const [dataSource, setDataSource, getDataSource] = useGetState<
     API_TIME.GetTimeImageListData[]
-  >([
-    {
-      _id: 'string',
-      event: 'string',
-      event_name: 'string',
-      start_date: 'string',
-      description: 'string',
-      image:
-        'https://t8.baidu.com/it/u=3032461838,1625380434&fm=217&app=126&size=re3,2&q=75&n=0&g=3n&f=JPEG&fmt=auto&maxorilen2heic=2000000?s=E9C0A3464AA5936E487CE40D030070C2',
-      image_id: 'string',
-      createdAt: 'string',
-      updatedAt: 'string',
-      create_date: 'string',
-    },
-    {
-      _id: 'string1',
-      event: 'string',
-      event_name: 'string',
-      start_date: 'string',
-      description: 'string',
-      image:
-        'https://t8.baidu.com/it/u=3032461838,1625380434&fm=217&app=126&size=re3,2&q=75&n=0&g=3n&f=JPEG&fmt=auto&maxorilen2heic=2000000?s=E9C0A3464AA5936E487CE40D030070C2',
-      image_id: 'string2',
-      createdAt: 'string',
-      updatedAt: 'string',
-      create_date: 'string',
-    },
-  ]);
+  >([]);
   const [hasMore, setHasMore] = useState(true);
   const [selectList, setSelectList] = useState<string[]>([]);
 
-  const currentPage = useRef(0);
+  const currentPage = useRef(-1);
 
   async function fetchData() {
     return getImageList({
@@ -77,7 +48,6 @@ const ImageDelete = () => {
   }, []);
 
   const handleDelete = useCallback(() => {
-    console.log(selectList, 222)
     Modal.confirm({
       content: '是否确定删除',
       onConfirm: async () => {
@@ -127,16 +97,11 @@ const ImageDelete = () => {
     });
   }, [dataSource]);
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
   return (
-    <div className={styles['image-delete']}>
-      <Header rightNode={(<Button onClick={handleCancel}>取消</Button>)} />
-      {dataSource.length > 0 ? (
+    <div className={classnames(styles['image-delete'])}>
+      {(
         <>
-          <div className={styles['image-list']}>
+          <div className={styles['image-delete-list']}>
             <Grid columns={3} gap={10}>
               {dataSource.map((item) => {
                 return (
@@ -163,13 +128,6 @@ const ImageDelete = () => {
             hasMore={hasMore}
           />
         </>
-      ) : (
-        <div className={styles.placeholder}>
-          <div className={styles.loadingWrapper}>
-            <DotLoading />
-          </div>
-          正在拼命加载数据
-        </div>
       )}
       <div className={styles['image-delete-footer']}>
         <Button onClick={handleCancel}>取消</Button>

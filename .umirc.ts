@@ -1,8 +1,8 @@
 import { defineConfig } from 'umi';
 import 'dotenv/config'
 
-// const API_DOMAIN = `http://${process.env.RASPBERRY_IP}`;
-const API_DOMAIN = 'http://localhost:4000';
+const API_DOMAIN = `http://${process.env.RASPBERRY_IP}`;
+// const API_DOMAIN = 'http://localhost:4000';
 
 export default defineConfig({
   hash: true,

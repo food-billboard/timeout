@@ -1,6 +1,5 @@
 import dayjs from 'dayjs';
 import { history } from 'umi';
-import Header from '@/components/Header';
 import type { DatePickerRef } from 'antd-mobile/es/components/date-picker';
 import { postTime, putTime } from '@/services/base';
 import { Toast, Form, Button, Input, DatePicker } from 'antd-mobile';
@@ -10,6 +9,10 @@ import { useCallback, RefObject } from 'react';
 
 const EventEdit = () => {
   const editValue = (history.location.state || {}) as API_TIME.GetTimeListData;
+  const {
+    event_name,
+    start_date
+  } = editValue
 
   const onSubmit = useCallback(async (values: any) => {
     const handler = Toast.show({
@@ -26,7 +29,6 @@ const EventEdit = () => {
 
   return (
     <div className={classnames(styles['event-edit'])}>
-      <Header />
       <div className={styles['event-edit-main']}>
         <Form
           layout="horizontal"
@@ -36,13 +38,17 @@ const EventEdit = () => {
             </Button>
           }
           onFinish={onSubmit}
+          initialValues={{
+            event_name,
+            start_date: dayjs(start_date).toDate()
+          }}
         >
           <Form.Item
             name="event_name"
             label="事件名称"
             rules={[{ required: true, message: '事件名称不能为空' }]}
           >
-            <Input onChange={console.log} placeholder="请输入姓名" />
+            <Input placeholder="请输入姓名" />
           </Form.Item>
           <Form.Item
             name="start_date"

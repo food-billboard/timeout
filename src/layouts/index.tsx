@@ -1,21 +1,13 @@
-import { Outlet, history } from 'umi';
-import { Toast, Avatar } from 'antd-mobile';
-import { useCallback, useEffect, useState } from 'react';
-import { Emitter } from '@/utils/routeListener'
-import { getUserInfo as getUserInfoData } from '@/utils/constants';
+import { Outlet } from 'umi';
+import { Toast } from 'antd-mobile';
+import { useEffect, useState } from 'react';
+import Header from '@/components/Header'
 import styles from './index.less';
 import mockLogin from '@/utils/mockLogin';
 
 export default function Layout() {
 
-  const [activeKey, setActiveKey] = useState('/');
-  const [loading, setLoading] = useState(false)
-
-  const { username, score, avatar } = getUserInfoData();
-
-  const onRouteChange = useCallback((key: string) => {
-    history.push(key);
-  }, []);
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     mockLogin()
@@ -25,23 +17,12 @@ export default function Layout() {
   }, [])
 
   useEffect(() => {
-    function listener() {
-      const currentKey = history.location.pathname
-      setActiveKey(currentKey);
-    }
-    Emitter.addListener('route-change', listener)
-    listener()
-    return () => {
-      Emitter.removeListener('route-listener')
-    }
-  }, []);
-
-  useEffect(() => {
     Toast.config({ duration: 500 });
   }, []);
 
   return (
     <div className={styles['score-app']}>
+      <Header />
       <div className={styles['score-app-main']}>
         <div className={styles['score-app-main-content']}> 
           {

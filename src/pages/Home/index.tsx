@@ -1,23 +1,13 @@
 import { SearchBar } from 'antd-mobile';
 import { history } from 'umi';
-import Header from '@/components/Header';
+import classnames from 'classnames'
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getTimeList } from '@/services/base';
 import styles from './index.less';
 import dayjs from 'dayjs';
 
 const PageHome = () => {
-  const [dataSource, setDataSource] = useState<API_TIME.GetTimeListData[]>([
-    {
-      _id: 'string', 
-      create_user: 'string', 
-      create_user_name: 'string', 
-      createdAt: 'string', 
-      updatedAt: 'string', 
-      event_name: 'string', 
-      start_date: 'string' 
-    }
-  ]);
+  const [dataSource, setDataSource] = useState<API_TIME.GetTimeListData[]>([]);
 
   const searchContent = useRef('');
 
@@ -43,8 +33,7 @@ const PageHome = () => {
   }, []);
 
   return (
-    <div className={styles['home']}>
-      <Header leftNode={<span></span>} />
+    <div className={classnames(styles['home'])}>
       <div className={styles['home-title']}>
         <SearchBar
           placeholder="请输入内容"

@@ -5,7 +5,6 @@ import classnames from 'classnames';
 import dayjs from 'dayjs';
 import type { DatePickerRef } from 'antd-mobile/es/components/date-picker';
 import { putImage } from '@/services/base';
-import Header from '@/components/Header';
 import styles from './index.less';
 
 const ImageEdit = () => {
@@ -31,7 +30,6 @@ const ImageEdit = () => {
 
   return (
     <div className={classnames(styles['image-edit'])}>
-      <Header />
       <div className={styles['image-edit-main']}>
         <Form
           layout="horizontal"

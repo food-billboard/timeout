@@ -8,10 +8,10 @@ import {
 } from 'antd-mobile';
 import { ReactNode, useCallback, useState } from 'react';
 import { history } from 'umi';
+import classnames from 'classnames'
 import { AddOutline } from 'antd-mobile-icons';
 import { getImageList, postImage } from '@/services/base';
 import styles from './index.less';
-import Header from '@/components/Header';
 import { useGetState } from 'ahooks';
 import EXIF from 'exif-js';
 import dayjs from 'dayjs';
@@ -49,34 +49,7 @@ const ImageList = () => {
     {}) as API_TIME.GetTimeListData;
 
   const [dataSource, setDataSource] = useState<API_TIME.GetTimeImageListData[]>(
-    [
-      {
-        _id: 'string',
-        event: 'string',
-        event_name: 'string',
-        start_date: 'string',
-        description: 'string',
-        image:
-          'https://t8.baidu.com/it/u=3032461838,1625380434&fm=217&app=126&size=re3,2&q=75&n=0&g=3n&f=JPEG&fmt=auto&maxorilen2heic=2000000?s=E9C0A3464AA5936E487CE40D030070C2',
-        image_id: 'string',
-        createdAt: 'string',
-        updatedAt: 'string',
-        create_date: 'string',
-      },
-      {
-        _id: 'string1',
-        event: 'string',
-        event_name: 'string',
-        start_date: 'string',
-        description: 'string',
-        image:
-          'https://t8.baidu.com/it/u=3032461838,1625380434&fm=217&app=126&size=re3,2&q=75&n=0&g=3n&f=JPEG&fmt=auto&maxorilen2heic=2000000?s=E9C0A3464AA5936E487CE40D030070C2',
-        image_id: 'string2',
-        createdAt: 'string',
-        updatedAt: 'string',
-        create_date: 'string',
-      },
-    ],
+    [],
   );
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore, getHasMore] = useGetState(true);
@@ -147,20 +120,7 @@ const ImageList = () => {
   }, [loading]);
 
   return (
-    <div className={styles['image-list']}>
-      <Header
-        rightNode={
-          <Button
-            onClick={() =>
-              history.push('/image-delete', {
-                event: _id,
-              })
-            }
-          >
-            管理
-          </Button>
-        }
-      />
+    <div className={classnames(styles['image-list'])}>
       <div className={styles['image-list-wrapper']}>
         <div className={styles['image-list-title']}>
           <div className={styles['image-list-title-left']}>

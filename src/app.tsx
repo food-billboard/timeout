@@ -1,4 +1,9 @@
 import { Emitter } from './utils/routeListener'
+import VConsole from 'vconsole';
+
+if(location.href.includes('vconsole')) {
+  const vConsole = new VConsole();
+}
 
 
 export const onRouteChange = (location: any, action: any) => {

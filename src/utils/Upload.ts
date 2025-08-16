@@ -130,28 +130,33 @@ export async function upload(file: File) {
 
 export function uploadFile(config: {
   beforeUpload?: () => boolean;
-  upload?: (file: File) => void;
-  uploadEnd?: (fileId: string) => any;
+  upload?: (file: File, index: number) => void;
+  uploadEnd?: (fileId: string, index: number) => any;
   callback?: () => void;
   accept: string;
+  multiple?: boolean 
 }) {
-  const { beforeUpload, upload: configUpload, uploadEnd, accept, callback } = config;
+  const { multiple, beforeUpload, upload: configUpload, uploadEnd, accept, callback } = config;
   if (beforeUpload && !beforeUpload()) return;
   const input = document.createElement('input');
   input.setAttribute('type', 'file');
   input.setAttribute('accept', accept);
-  input.addEventListener('change', (e: any) => {
-    const file = e.target?.files[0];
-    if (file) {
-      configUpload?.(file);
-      upload(file)
-        .then(({ id, filePath }: any) => {
-          return uploadEnd?.(id);
-        })
-        .then(() => {
-          callback?.();
-        });
+  if(multiple) {
+    input.setAttribute('multiple', 'multiple')
+  }
+  input.addEventListener('change', async (e: any) => {
+    const files = e.target?.files;
+    for(let index = 0; index < (multiple ? files.length : 1); index ++) {
+      const file = files[index]
+      if (file) {
+        configUpload?.(file, index);
+        await upload(file)
+          .then(({ id, filePath }: any) => {
+            return uploadEnd?.(id, index);
+          })
+      }
     }
+    callback?.()
   });
   input.click();
 }

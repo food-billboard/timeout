@@ -1,19 +1,14 @@
-import {
-  InfiniteScroll,
-  Tabs,
-  Grid,
-  FloatingBubble,
-  Steps,
-} from 'antd-mobile';
+import { InfiniteScroll, Tabs, Grid, FloatingBubble, Steps } from 'antd-mobile';
 import { ReactNode, useCallback, useState } from 'react';
 import { history } from 'umi';
-import classnames from 'classnames'
+import classnames from 'classnames';
 import { AddOutline } from 'antd-mobile-icons';
 import { getImageList, postImage } from '@/services/base';
 import styles from './index.less';
 import { useGetState } from 'ahooks';
 import exifr from 'exifr';
 import dayjs from 'dayjs';
+import { pick } from 'lodash'
 import { uploadFile } from '@/utils/Upload';
 import ImageView from './ImageView';
 
@@ -85,33 +80,38 @@ const ImageList = () => {
     const metaData: any = {
       description: '',
       event: _id,
+      image: [],
+      file: [],
     };
     uploadFile({
+      multiple: true,
       accept: 'image/*',
       callback: async () => {
-        const allMetadata = await exifr.parse(metaData.file);
-        await postImage({
-          ...metaData,
-          create_date:
-            allMetadata.DateTimeOriginal || dayjs().format('YYYY-MM-DD'),
-        })
-          .then(() => {})
-          .catch((err) => {})
-          .then(() => {
-            setLoading(false);
-            fetchData(true);
-          });
+        for (let index = 0; index < metaData.file.length; index++) {
+          const file = metaData.file[index];
+          const allMetadata = await exifr.parse(file);
+          await postImage({
+            ...pick(metaData, ['description', 'event']),
+            image: metaData.image[index],
+            create_date:
+              allMetadata.DateTimeOriginal || dayjs().format('YYYY-MM-DD'),
+          })
+            .then(() => {})
+            .catch((err) => {});
+        }
+        setLoading(false);
+        fetchData(true);
       },
-      uploadEnd: (fileId) => {
-        metaData.image = fileId;
+      uploadEnd: (fileId, index) => {
+        metaData.image[index] = fileId;
       },
-      upload: (file) => {
-        metaData.file = file;
+      upload: (file, index) => {
+        metaData.file[index] = file;
       },
       beforeUpload: () => {
         setLoading(true);
-        return true 
-      }
+        return true;
+      },
     });
   }, [loading]);
 
@@ -160,7 +160,11 @@ const ImageList = () => {
                               styles['image-list-main-content-timeline']
                             }
                           >
-                            <div className={styles['image-list-main-content-timeline-info']}>
+                            <div
+                              className={
+                                styles['image-list-main-content-timeline-info']
+                              }
+                            >
                               <div>{event_name}已经</div>
                               <div>
                                 {dayjs(create_date).diff(
@@ -170,7 +174,7 @@ const ImageList = () => {
                               </div>
                             </div>
                             <div>
-                              <ImageView  
+                              <ImageView
                                 src={image}
                                 onClick={handleImageDetail.bind(null, item)}
                               />

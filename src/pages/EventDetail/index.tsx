@@ -1,32 +1,87 @@
 import { history } from 'umi';
-import { useCallback } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import classnames from 'classnames';
 import { CameraOutline } from 'antd-mobile-icons';
+import { getTimeList } from '@/services/base';
 import styles from './index.less';
 import dayjs from 'dayjs';
-import { FloatingBubble } from 'antd-mobile';
+import { FloatingBubble, Swiper } from 'antd-mobile';
+
+let CurrentEvent: API_TIME.GetTimeListData | false = false
+
+export function setCurrentEvent(event: API_TIME.GetTimeListData | false) {
+  CurrentEvent = event 
+}
 
 const EventDetail = () => {
   const eventData = (history.location.state || {}) as API_TIME.GetTimeListData;
-  const { event_name, start_date, _id } = eventData;
+  if(!CurrentEvent) {
+    CurrentEvent = eventData
+  }
+
+  const { _id } = CurrentEvent;
+
+  const [dataSource, setDataSource] = useState<API_TIME.GetTimeListData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [index, setIndex] = useState(0);
 
   const handleClick = useCallback(() => {
-    history.push('/image-list', eventData);
-  }, [eventData]);
+    history.push('/image-list', dataSource[index]);
+  }, [dataSource, index]);
 
   const handleEdit = useCallback(() => {
-    history.push('/event-edit', eventData);
-  }, [eventData]);
+    history.push('/event-edit', dataSource[index]);
+  }, [dataSource, index]);
+
+  const fetchData = useCallback(async () => {
+    return getTimeList({
+      currPage: 0,
+      pageSize: 999,
+    }).then((data) => {
+      setDataSource(data.list);
+      setIndex(data.list.findIndex((item: any) => item._id === _id))
+      setLoading(false);
+    });
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  if (loading) return <></>;
 
   return (
-    <div className={classnames(styles['event-detail'])}>
-      <div className={styles['event-detail-main']}>
-        <div className={styles['event-detail-title']}>{event_name}已经</div>
-        <div className={styles['event-detail-content']}>
-          <div>{dayjs().diff(dayjs(start_date), 'day')}</div>
-          <div>起始日：{dayjs(start_date).format('YYYY-MM-DD dddd')}</div>
-        </div>
-      </div>
+    <div style={{ height: '100%' }}>
+      <Swiper
+        style={{ height: '100%' }}
+        indicator={() => null}
+        onIndexChange={index => {
+          setIndex(index)
+          setCurrentEvent(dataSource[index])
+        }}
+        defaultIndex={dataSource.findIndex((item) => item._id === _id)}
+      >
+        {dataSource.map((item) => {
+          const { event_name, start_date, _id } = item;
+          return (
+            <Swiper.Item key={_id} onClick={handleEdit}>
+              <div className={classnames(styles['event-detail'])}>
+                <div className={styles['event-detail-main']}>
+                  <div className={styles['event-detail-title']}>
+                    {event_name}已经
+                  </div>
+                  <div className={styles['event-detail-content']}>
+                    <div>{dayjs().diff(dayjs(start_date), 'day')}</div>
+                    <div>
+                      起始日：{dayjs(start_date).format('YYYY-MM-DD dddd')}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Swiper.Item>
+          );
+        })}
+      </Swiper>
       <FloatingBubble
         style={{
           '--initial-position-bottom': '128px',

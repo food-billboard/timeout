@@ -35,9 +35,7 @@ const Header = (props: {
       '/event-detail': {
         title: '',
         left: <Button onClick={() => history.go(-1)}>返回</Button>,
-        right: (
-          <Button onClick={() => history.push('/event-edit', state)}>编辑</Button>
-        )
+        right: false
       },
       '/event-edit': {
         title: '',

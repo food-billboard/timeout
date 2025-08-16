@@ -3,6 +3,7 @@ import { history } from 'umi';
 import classnames from 'classnames'
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getTimeList } from '@/services/base';
+import { setCurrentEvent } from '../EventDetail'
 import styles from './index.less';
 import dayjs from 'dayjs';
 
@@ -12,7 +13,8 @@ const PageHome = () => {
   const searchContent = useRef('');
 
   const handleClick = useCallback((item: API_TIME.GetTimeListData) => {
-    history.push('/event-detail', item);
+    setCurrentEvent(false)
+    history.push('/event-detail', item)
   }, []);
 
   const fetchData = useCallback(async (reset: boolean = false) => {

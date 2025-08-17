@@ -2,6 +2,7 @@ import { Emitter } from './utils/routeListener'
 import VConsole from 'vconsole';
 
 if(location.href.includes('vconsole')) {
+  window.vconsole = true 
   const vConsole = new VConsole();
 }
 

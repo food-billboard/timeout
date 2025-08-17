@@ -39,7 +39,7 @@ const ImageView = (props: {
   }, [src])
 
   return (
-    <img src={stateSrc} onClick={onClick} />
+    <img style={{width: '100%'}} src={stateSrc} onClick={onClick} />
   )
 
 }

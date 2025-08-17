@@ -1,15 +1,24 @@
-import { InfiniteScroll, Tabs, Grid, FloatingBubble, Steps } from 'antd-mobile';
-import { ReactNode, useCallback, useState } from 'react';
+import {
+  InfiniteScroll,
+  Tabs,
+  Grid,
+  FloatingBubble,
+  Steps,
+  ImageUploader,
+} from 'antd-mobile';
+import { ReactNode, useCallback, useState, useRef } from 'react';
 import { history } from 'umi';
 import classnames from 'classnames';
 import { AddOutline } from 'antd-mobile-icons';
+import type { ImageUploaderRef } from 'antd-mobile';
 import { getImageList, postImage } from '@/services/base';
 import styles from './index.less';
 import { useGetState } from 'ahooks';
 import exifr from 'exifr';
 import dayjs from 'dayjs';
-import { pick } from 'lodash'
-import { uploadFile } from '@/utils/Upload';
+import { pick } from 'lodash';
+import { uploadFileWithoutInput } from '@/utils/Upload';
+import { hasDays } from '@/utils/tool';
 import ImageView from './ImageView';
 
 export const ImageGrid = (props: {
@@ -51,6 +60,8 @@ const ImageList = () => {
   const [_, setCurrPage, getCurrPage] = useGetState(-1);
   const [activeKey, setActiveKey] = useState('all');
 
+  const input = useRef<ImageUploaderRef>(null);
+
   const fetchData = useCallback(async (reset: boolean = false) => {
     const currPage = getCurrPage();
     const newCurrPage = reset ? 0 : currPage + 1;
@@ -75,45 +86,55 @@ const ImageList = () => {
     [],
   );
 
-  const handleUpload = useCallback(async () => {
-    if (loading) return;
-    const metaData: any = {
-      description: '',
-      event: _id,
-      image: [],
-      file: [],
-    };
-    uploadFile({
-      multiple: true,
-      accept: 'image/*',
-      callback: async () => {
-        for (let index = 0; index < metaData.file.length; index++) {
-          const file = metaData.file[index];
-          const allMetadata = await exifr.parse(file);
-          await postImage({
-            ...pick(metaData, ['description', 'event']),
-            image: metaData.image[index],
-            create_date:
-              allMetadata.DateTimeOriginal || dayjs().format('YYYY-MM-DD'),
-          })
-            .then(() => {})
-            .catch((err) => {});
-        }
-        setLoading(false);
-        fetchData(true);
-      },
-      uploadEnd: (fileId, index) => {
-        metaData.image[index] = fileId;
-      },
-      upload: (file, index) => {
-        metaData.file[index] = file;
-      },
-      beforeUpload: () => {
-        setLoading(true);
-        return true;
-      },
-    });
-  }, [loading]);
+  const requestUpload = useCallback(
+    async (file: any, files: any[]) => {
+      if (loading) return null;
+      const [lastFile] = files.slice(-1);
+      if (file !== lastFile) return null;
+      const metaData: any = {
+        description: '',
+        event: _id,
+        image: [],
+        files,
+      };
+      return new Promise<null>((resolve) => {
+        uploadFileWithoutInput({
+          files,
+          callback: async () => {
+            for (let index = 0; index < files.length; index++) {
+              const file = files[index];
+              const allMetadata = await exifr.parse(file);
+              await postImage({
+                ...pick(metaData, ['description', 'event']),
+                image: metaData.image[index],
+                create_date:
+                  allMetadata.DateTimeOriginal || dayjs().format('YYYY-MM-DD'),
+              })
+                .then(() => {})
+                .catch((err) => {});
+            }
+            setLoading(false);
+            fetchData(true);
+            resolve(null);
+          },
+          uploadEnd: (fileId, index) => {
+            metaData.image[index] = fileId;
+          },
+          upload: (file, index) => {
+            setLoading(true);
+          },
+        });
+      });
+    },
+    [loading],
+  );
+
+  const handleUpload = useCallback(() => {
+    const nativeInput = input.current?.nativeElement;
+    if (nativeInput) {
+      nativeInput.click();
+    }
+  }, []);
 
   return (
     <div className={classnames(styles['image-list'])}>
@@ -124,7 +145,7 @@ const ImageList = () => {
             <div>{dayjs(start_date).format('YYYY-MM-DD dddd')}</div>
           </div>
           <div className={styles['image-list-title-right']}>
-            {dayjs().diff(dayjs(start_date), 'day')}
+            {hasDays(start_date)}
           </div>
         </div>
         <div className={styles['image-list-main']}>
@@ -154,6 +175,10 @@ const ImageList = () => {
                         key={_id}
                         title={dayjs(create_date).format('YYYY-MM-DD')}
                         status="process"
+                        style={{
+                          width: '100%',
+                          overflow: 'hidden',
+                        }}
                         description={
                           <div
                             className={
@@ -204,6 +229,18 @@ const ImageList = () => {
         </FloatingBubble>
         <InfiniteScroll loadMore={fetchData.bind(false)} hasMore={hasMore} />
       </div>
+      <ImageUploader
+        ref={input}
+        value={[]}
+        multiple
+        showUpload={false}
+        upload={async () => {
+          return {
+            url: '',
+          };
+        }}
+        beforeUpload={requestUpload}
+      />
     </div>
   );
 };

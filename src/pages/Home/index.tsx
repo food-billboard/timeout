@@ -3,9 +3,9 @@ import { history } from 'umi';
 import classnames from 'classnames'
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getTimeList } from '@/services/base';
+import { hasDays } from '@/utils/tool'
 import { setCurrentEvent } from '../EventDetail'
 import styles from './index.less';
-import dayjs from 'dayjs';
 
 const PageHome = () => {
   const [dataSource, setDataSource] = useState<API_TIME.GetTimeListData[]>([]);
@@ -60,7 +60,7 @@ const PageHome = () => {
               </div>
               <div className={styles['home-list-item-extra']}>
                 <div className={styles['home-list-item-number']}>
-                  {dayjs().diff(dayjs(start_date), 'day')}
+                  {hasDays(start_date)}
                 </div>
                 <div className={styles['home-list-item-unit']}>天</div>
               </div>

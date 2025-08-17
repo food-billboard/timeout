@@ -1,7 +1,7 @@
 import { Toast } from 'antd-mobile';
 import { Upload } from 'chunk-file-upload';
 import { nanoid } from 'nanoid';
-import mime from 'mime'
+import mime from 'mime';
 import {
   checkUploadFile,
   uploadFile as requestUploadFile,
@@ -29,7 +29,12 @@ export function exitDataFn(onResponse: Function) {
       size,
       name: md5,
     });
-    onResponse(data, `${process.env.API_DOMAIN}/static/${suffix.startsWith('image') ? 'image' : 'video'}/${md5}.${mime.getExtension(suffix)}`);
+    onResponse(
+      data,
+      `${process.env.API_DOMAIN}/static/${
+        suffix.startsWith('image') ? 'image' : 'video'
+      }/${md5}.${mime.getExtension(suffix)}`,
+    );
     return data;
   };
 }
@@ -83,9 +88,10 @@ export async function upload(file: File) {
   const UPLOAD_INSTANCE = new Upload();
 
   let fileId: string = '';
-  let filePath: string = ''
+  let filePath: string = '';
 
   return new Promise((resolve, reject) => {
+    console.log(111111);
     const [name] = UPLOAD_INSTANCE.add({
       file: {
         file,
@@ -93,7 +99,7 @@ export async function upload(file: File) {
       request: {
         exitDataFn: exitDataFn(function (data: any, path: string) {
           fileId = data._id;
-          filePath = path
+          filePath = path;
         }),
         uploadFn: uploadFn(),
         callback(err) {
@@ -102,7 +108,7 @@ export async function upload(file: File) {
           } else {
             resolve({
               id: fileId,
-              filePath
+              filePath,
             });
           }
         },
@@ -110,20 +116,24 @@ export async function upload(file: File) {
     });
 
     if (!name) {
+      console.log(22222);
       return Promise.reject();
     } else {
+      console.log(333333);
       UPLOAD_INSTANCE.deal(name);
     }
   })
     .then(() => {
+      console.log(44444);
       UPLOAD_INSTANCE.dispose();
       return {
         id: fileId,
-        filePath
+        filePath,
       };
     })
     .catch((err) => {
       UPLOAD_INSTANCE.dispose();
+      console.error('upload error', err);
       return Promise.reject(err);
     });
 }
@@ -134,29 +144,84 @@ export function uploadFile(config: {
   uploadEnd?: (fileId: string, index: number) => any;
   callback?: () => void;
   accept: string;
-  multiple?: boolean 
+  multiple?: boolean;
 }) {
-  const { multiple, beforeUpload, upload: configUpload, uploadEnd, accept, callback } = config;
+  const {
+    multiple,
+    beforeUpload,
+    upload: configUpload,
+    uploadEnd,
+    accept,
+    callback,
+  } = config;
   if (beforeUpload && !beforeUpload()) return;
   const input = document.createElement('input');
   input.setAttribute('type', 'file');
   input.setAttribute('accept', accept);
-  if(multiple) {
-    input.setAttribute('multiple', 'multiple')
+  if (multiple) {
+    input.setAttribute('multiple', 'multiple');
   }
   input.addEventListener('change', async (e: any) => {
+    const { close } = Toast.show({
+      content: '文件上传中',
+      duration: 0,
+    });
     const files = e.target?.files;
-    for(let index = 0; index < (multiple ? files.length : 1); index ++) {
-      const file = files[index]
+    if (window.vconsole) {
+      console.log(files);
+    }
+    for (let index = 0; index < (multiple ? files.length : 1); index++) {
+      const file = files[index];
       if (file) {
         configUpload?.(file, index);
-        await upload(file)
-          .then(({ id, filePath }: any) => {
-            return uploadEnd?.(id, index);
-          })
+        if (window.vconsole) {
+          console.log('startUpload');
+        }
+        await upload(file).then(({ id, filePath }: any) => {
+          return uploadEnd?.(id, index);
+        });
       }
     }
-    callback?.()
+    close();
+    callback?.();
   });
   input.click();
+}
+
+export async function uploadFileWithoutInput(config: {
+  beforeUpload?: () => boolean;
+  upload?: (file: File, index: number) => void;
+  uploadEnd?: (fileId: string, index: number) => any;
+  callback?: () => void;
+  files: any[];
+}) {
+  const {
+    files,
+    beforeUpload,
+    upload: configUpload,
+    uploadEnd,
+    callback,
+  } = config;
+  if (beforeUpload && !beforeUpload()) return;
+  const { close } = Toast.show({
+    content: '文件上传中',
+    duration: 0,
+  });
+  if (!window.vconsole) {
+    console.log(files);
+  }
+  for (let index = 0; index < files.length; index++) {
+    const file = files[index];
+    if (file) {
+      configUpload?.(file, index);
+      if (window.vconsole) {
+        console.log('startUpload');
+      }
+      await upload(file).then(({ id, filePath }: any) => {
+        return uploadEnd?.(id, index);
+      });
+    }
+  }
+  Toast.clear()
+  callback?.();
 }

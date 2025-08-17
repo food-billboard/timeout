@@ -3,6 +3,7 @@ import { useCallback, useState, useEffect } from 'react';
 import classnames from 'classnames';
 import { CameraOutline } from 'antd-mobile-icons';
 import { getTimeList } from '@/services/base';
+import { hasDays } from '@/utils/tool'
 import styles from './index.less';
 import dayjs from 'dayjs';
 import { FloatingBubble, Swiper } from 'antd-mobile';
@@ -64,14 +65,14 @@ const EventDetail = () => {
         {dataSource.map((item) => {
           const { event_name, start_date, _id } = item;
           return (
-            <Swiper.Item key={_id} onClick={handleEdit}>
+            <Swiper.Item key={_id}>
               <div className={classnames(styles['event-detail'])}>
-                <div className={styles['event-detail-main']}>
+                <div className={styles['event-detail-main']} onClick={handleEdit}>
                   <div className={styles['event-detail-title']}>
                     {event_name}已经
                   </div>
                   <div className={styles['event-detail-content']}>
-                    <div>{dayjs().diff(dayjs(start_date), 'day')}</div>
+                    <div>{hasDays(start_date)}</div>
                     <div>
                       起始日：{dayjs(start_date).format('YYYY-MM-DD dddd')}
                     </div>

@@ -3,8 +3,8 @@ import qs from 'querystring'
 import { history } from 'umi';
 import dayjs from 'dayjs'
 
-export const hasDays = (day: dayjs.Dayjs | string) => {
-  return dayjs().diff(dayjs(day), 'day') + 1
+export const hasDays = (day: dayjs.Dayjs | string, currentDay?: dayjs.Dayjs | string) => {
+  return dayjs(currentDay).diff(dayjs(day), 'day') + 1
 }
 
 // 处理query 传参的时候导致的空字符串查询问题（后端不愿意给处理）

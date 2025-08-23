@@ -1,10 +1,9 @@
 import { SearchBar } from 'antd-mobile';
-import { history } from 'umi';
+import { history, KeepAlive } from 'umi';
 import classnames from 'classnames'
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getTimeList } from '@/services/base';
 import { hasDays } from '@/utils/tool'
-import { setCurrentEvent } from '../EventDetail'
 import styles from './index.less';
 
 const PageHome = () => {
@@ -13,7 +12,6 @@ const PageHome = () => {
   const searchContent = useRef('');
 
   const handleClick = useCallback((item: API_TIME.GetTimeListData) => {
-    setCurrentEvent(false)
     history.push('/event-detail', item)
   }, []);
 
@@ -72,4 +70,10 @@ const PageHome = () => {
   );
 };
 
-export default PageHome;
+export default () => {
+  return (
+    <KeepAlive name="home" when saveScrollPosition="screen">
+      <PageHome />
+    </KeepAlive>
+  )
+};

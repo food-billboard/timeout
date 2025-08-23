@@ -73,41 +73,6 @@ declare namespace API_TIME {
     start_date: string 
   }
 
-  export type PutScoreMemoryParams = {
-    _id: string 
-    create_content: string 
-    create_description?: string 
-    target_score: number 
-    score_type: string
-  }
-
-  export type GetScoreExchangeMemoryListParams = {
-    content?: string 
-    start_date?: string 
-    end_date?: string 
-    check_start_date?: string 
-    check_end_date?: string 
-    checked?: boolean 
-    currPage?: number 
-    pageSize?: number 
-  }
-
-  export type GetScoreExchangeMemoryListData = {
-    _id: string 
-    exchange_user: string 
-    exchange_user_name: string 
-    exchange_target: string 
-    exchange_target_name: string 
-    award_name: string 
-    award_exchange_score: string 
-    award_image_list: string[]
-    check_time: string 
-    createdAt: string 
-    updatedAt: string 
-    currPage: number 
-    pageSize: number 
-  }
-
   export type PostTimeParams = {
     event_name: string 
     start_date: string 

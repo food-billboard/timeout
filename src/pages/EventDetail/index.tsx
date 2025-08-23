@@ -1,4 +1,4 @@
-import { history } from 'umi';
+import { history, KeepAlive } from 'umi';
 import { useCallback, useState, useEffect } from 'react';
 import classnames from 'classnames';
 import { CameraOutline } from 'antd-mobile-icons';
@@ -8,19 +8,9 @@ import styles from './index.less';
 import dayjs from 'dayjs';
 import { FloatingBubble, Swiper } from 'antd-mobile';
 
-let CurrentEvent: API_TIME.GetTimeListData | false = false
-
-export function setCurrentEvent(event: API_TIME.GetTimeListData | false) {
-  CurrentEvent = event 
-}
-
 const EventDetail = () => {
   const eventData = (history.location.state || {}) as API_TIME.GetTimeListData;
-  if(!CurrentEvent) {
-    CurrentEvent = eventData
-  }
-
-  const { _id } = CurrentEvent;
+  const { _id } = eventData;
 
   const [dataSource, setDataSource] = useState<API_TIME.GetTimeListData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -46,8 +36,9 @@ const EventDetail = () => {
   }, []);
 
   useEffect(() => {
+    setLoading(true)
     fetchData();
-  }, []);
+  }, [_id]);
 
   if (loading) return <></>;
 
@@ -58,7 +49,6 @@ const EventDetail = () => {
         indicator={() => null}
         onIndexChange={index => {
           setIndex(index)
-          setCurrentEvent(dataSource[index])
         }}
         defaultIndex={dataSource.findIndex((item) => item._id === _id)}
       >
@@ -97,4 +87,10 @@ const EventDetail = () => {
   );
 };
 
-export default EventDetail;
+export default () => {
+  return (
+    <KeepAlive name="event-detail" when saveScrollPosition="screen">
+      <EventDetail />
+    </KeepAlive>
+  )
+};

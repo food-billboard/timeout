@@ -6,8 +6,8 @@ import {
   Steps,
   ImageUploader,
 } from 'antd-mobile';
-import { ReactNode, useCallback, useState, useRef } from 'react';
-import { history } from 'umi';
+import { ReactNode, useCallback, useState, useRef, useEffect } from 'react';
+import { history, KeepAlive } from 'umi';
 import classnames from 'classnames';
 import { AddOutline } from 'antd-mobile-icons';
 import type { ImageUploaderRef } from 'antd-mobile';
@@ -19,6 +19,7 @@ import dayjs from 'dayjs';
 import { pick } from 'lodash';
 import { uploadFileWithoutInput } from '@/utils/Upload';
 import { hasDays } from '@/utils/tool';
+import { setCurrentData } from '../ImageDetail';
 import ImageView from './ImageView';
 
 export const ImageGrid = (props: {
@@ -39,7 +40,7 @@ export const ImageGrid = (props: {
       <div>
         <ImageView src={image} />
         <div className={styles['image-list-item-info']}>
-          <div>{dayjs(create_date).diff(start_date, 'day')}</div>
+          <div>{hasDays(start_date, create_date)}</div>
           <div>{dayjs(create_date).format('YYYY-MM-DD')}</div>
         </div>
         {extra}
@@ -61,26 +62,31 @@ const ImageList = () => {
   const [activeKey, setActiveKey] = useState('all');
 
   const input = useRef<ImageUploaderRef>(null);
+  const prevId = useRef(_id);
 
-  const fetchData = useCallback(async (reset: boolean = false) => {
-    const currPage = getCurrPage();
-    const newCurrPage = reset ? 0 : currPage + 1;
-    setCurrPage(newCurrPage);
-    return getImageList({
-      event: _id,
-      currPage: newCurrPage,
-      pageSize: 10,
-    }).then((data) => {
-      setDataSource((prev) => {
-        if (reset) return data.list;
-        return [...prev, ...data.list];
+  const fetchData = useCallback(
+    async (reset: boolean = false) => {
+      const currPage = getCurrPage();
+      let newCurrPage = reset ? 0 : currPage + 1;
+      setCurrPage(newCurrPage);
+      return getImageList({
+        event: _id,
+        currPage: newCurrPage,
+        pageSize: 10,
+      }).then((data) => {
+        setDataSource((prev) => {
+          if (reset) return data.list;
+          return [...prev, ...data.list];
+        });
+        setHasMore(data.list.length === 10);
       });
-      setHasMore(data.list.length === 10);
-    });
-  }, []);
+    },
+    [_id],
+  );
 
   const handleImageDetail = useCallback(
     (item: API_TIME.GetTimeImageListData) => {
+      setCurrentData({});
       return history.push('/image-detail', item);
     },
     [],
@@ -135,6 +141,14 @@ const ImageList = () => {
       nativeInput.click();
     }
   }, []);
+
+  useEffect(() => {
+    // 存在缓存需求
+    if (prevId.current !== _id) {
+      prevId.current = _id;
+      fetchData(true)
+    }
+  }, [_id]);
 
   return (
     <div className={classnames(styles['image-list'])}>
@@ -191,12 +205,7 @@ const ImageList = () => {
                               }
                             >
                               <div>{event_name}已经</div>
-                              <div>
-                                {dayjs(create_date).diff(
-                                  dayjs(start_date),
-                                  'day',
-                                )}
-                              </div>
+                              <div>{hasDays(start_date, create_date)}</div>
                             </div>
                             <div>
                               <ImageView
@@ -245,4 +254,10 @@ const ImageList = () => {
   );
 };
 
-export default ImageList;
+export default () => {
+  return (
+    <KeepAlive name="image-list" when saveScrollPosition="screen">
+      <ImageList />
+    </KeepAlive>
+  );
+};

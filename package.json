@@ -25,6 +25,7 @@
     "lodash": "^4.17.21",
     "mime": "^4.0.6",
     "umi": "^4.4.1",
+    "umi-plugin-keep-alive": "^0.0.1-beta.35",
     "vconsole": "^3.15.1"
   },
   "devDependencies": {

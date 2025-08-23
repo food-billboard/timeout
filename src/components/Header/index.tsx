@@ -1,21 +1,22 @@
-import { Button } from 'antd-mobile';
+import { Button, Toast, Modal } from 'antd-mobile';
 import { ReactNode, useCallback, useMemo, useEffect, useState } from 'react';
 import { history } from 'umi';
 import { Emitter } from '@/utils/routeListener'
+import { deleteTime } from '@/services/base'
 import styles from './index.less'
 
 const Header = (props: {
   leftNode?: ReactNode
   centerNode?: ReactNode
-  rightNode?: ReactNode 
+  rightNode?: ReactNode
 }) => {
 
-  const { leftNode, rightNode, centerNode } = props 
+  const { leftNode, rightNode, centerNode } = props
 
   const state = (history.location.state || {}) as any
   const {
     _id
-  } = state 
+  } = state
 
   const [currentPath, setCurrentPath] = useState('/')
 
@@ -40,7 +41,30 @@ const Header = (props: {
       '/event-edit': {
         title: '',
         left: <Button onClick={() => history.go(-1)}>返回</Button>,
-        right: ''
+        right: <Button onClick={() => {
+          Modal.confirm({
+            content: '是否确定删除',
+            onConfirm: async () => {
+              try {
+                await deleteTime({
+                  _id: state._id
+                });
+                Toast.show({
+                  icon: 'success',
+                  content: '操作成功',
+                  afterClose: () => {
+                    history.go(-1);
+                  },
+                });
+              } catch (err) {
+                Toast.show({
+                  icon: 'fail',
+                  content: '操作失败',
+                });
+              }
+            },
+          });
+        }}>删除</Button>,
       },
       '/image-list': {
         title: '',
@@ -79,7 +103,7 @@ const Header = (props: {
   const {
     title,
     left,
-    right 
+    right
   } = useMemo(() => {
     return (PATH_HEADER_MAP as any)[currentPath] || PATH_HEADER_MAP['/']
   }, [currentPath, PATH_HEADER_MAP])

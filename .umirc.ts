@@ -5,6 +5,7 @@ const API_DOMAIN = `http://${process.env.RASPBERRY_IP}`;
 // const API_DOMAIN = 'http://localhost:4000';
 
 export default defineConfig({
+  plugins: ['umi-plugin-keep-alive'],
   hash: true,
   history: {
     type: 'hash',
@@ -28,14 +29,19 @@ export default defineConfig({
     'process.env.MOCK_PASSWORD': process.env.MOCK_PASSWORD,
     'process.env.MOCK_EMAIL': process.env.MOCK_EMAIL
   },
+  // keepalive: [
+  //   /image-list/, 
+  //   /event-detail/,
+  //   /image-detail/
+  // ],
   routes: [
-    { path: '/', component: '@/pages/Home/index' },
-    { path: '/image-list', component: '@/pages/ImageList/index' },
-    { path: '/event-detail', component: '@/pages/EventDetail/index' },
+    { name: "首页", path: '/', component: '@/pages/Home/index', keepalive: true, },
+    { name: "图片列表", path: '/image-list', component: '@/pages/ImageList/index', keepalive: true, },
+    { name: "事件详情", path: '/event-detail', component: '@/pages/EventDetail/index', keepalive: true, },
     { path: '/event-edit', component: '@/pages/EventEdit/index' },
     { path: '/image-edit', component: '@/pages/ImageEdit/index' },
     { path: '/image-delete', component: '@/pages/ImageDelete/index' },
-    { path: '/image-detail', component: '@/pages/ImageDetail/index' },
+    { name: "图片详情", path: '/image-detail', component: '@/pages/ImageDetail/index', keepalive: true, },
   ],
   npmClient: 'yarn',
   scripts: [

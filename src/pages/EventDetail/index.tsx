@@ -33,7 +33,7 @@ const EventDetail = () => {
       setIndex(data.list.findIndex((item: any) => item._id === _id))
       setLoading(false);
     });
-  }, []);
+  }, [_id]);
 
   useEffect(() => {
     setLoading(true)
